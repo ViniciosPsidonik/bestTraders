@@ -9,10 +9,31 @@ var express = require('express')
 var app = express()
 app.use(cors({ origin: '*' }))
 
+let runningActives = []
+let runningActivesBinary = []
+let runningActivesDigital = []
+let runningActivesDigitalFive = []
+
+setInterval(() => {
+    console.log('Turbo: ' + runningActives.length)
+    console.log('Binary: ' + runningActivesBinary.length)
+    console.log('Digital: ' + runningActivesDigital.length)
+    console.log('DigitalFive: ' + runningActivesDigitalFive.length)
+    console.log('===================')
+    log(buysMap.size)
+}, 5000)
+
+setInterval(() => {
+    runningActives = []
+    runningActivesBinary = []
+    runningActivesDigital = []
+    runningActivesDigitalFive = []
+    // loginAsync(ssid)
+}, 300000)
 
 app.get('/bestTraders/:tagId', function (req, res) {
     let number = req.params.tagId
-    Rank.find({}).limit(parseInt(number)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs)=> {
+    Rank.find({}).limit(parseInt(number)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
         log(docs)
         let itemsBack = []
         for (let index = 0; index < docs.length; index++) {
@@ -115,10 +136,6 @@ const sendToDataBase = () => {
     }
 }
 
-setInterval(() => {
-    log(buysMap.size)
-}, 5000);
-
 const onMessage = e => {
     const message = JSON.parse(e.data)
     if (message.name == 'heartbeat') {
@@ -141,9 +158,23 @@ const onMessage = e => {
     const msg = message.msg
     if (message.name == "live-deal-binary-option-placed") {
         buysMap.set(msg.option_id, { createdAt: msg.created_at, expiration: msg.expiration, direction: msg.direction, active: msg.active_id, userId: msg.user_id, name: msg.name, priceAtBuy: pricesMap.get(msg.active_id) })
+        if (message.msg.option_type == 'turbo') {
+            if (!runningActives.includes(message.msg.active_id))
+                runningActives.push(message.msg.active_id)
+        } else {
+            if (!runningActivesBinary.includes(message.msg.active_id))
+                runningActivesBinary.push(message.msg.active_id)
+        }
     }
     if (message.name == "live-deal-digital-option") {
         buysMap.set(msg.position_id, { createdAt: msg.created_at, expiration: msg.instrument_expiration, direction: msg.instrument_dir, active: msg.instrument_active_id, userId: msg.user_id, name: msg.name, priceAtBuy: pricesMap.get(msg.active_id) })
+        if (message.msg.expiration_type == 'PT1M') {
+            if (!runningActivesDigital.includes(message.msg.instrument_active_id))
+                runningActivesDigital.push(message.msg.instrument_active_id)
+        } else {
+            if (!runningActivesDigitalFive.includes(message.msg.instrument_active_id))
+                runningActivesDigitalFive.push(message.msg.instrument_active_id)
+        }
     }
 
 }
