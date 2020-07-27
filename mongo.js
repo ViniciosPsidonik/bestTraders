@@ -7,5 +7,4 @@ mongoose.set('useFindAndModify', false)
 
 var Rank = mongoose.model('Rank', schema)
 
-
 module.exports = Rank
