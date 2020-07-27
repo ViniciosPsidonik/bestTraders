@@ -29,6 +29,8 @@ setInterval(() => {
     runningActivesDigital = []
     runningActivesDigitalFive = []
     // loginAsync(ssid)
+
+    axios.get('https://besttraders.herokuapp.com/')
 }, 300000)
 
 app.get('/bestTraders/:tagId', function (req, res) {
