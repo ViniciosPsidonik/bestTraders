@@ -24,6 +24,10 @@ app.get('/bestTraders/:tagId', function (req, res) {
 
 })
 
+app.get('/', function (req, res) {
+    res.send('Opa')
+})
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT)
 const log = m => {
