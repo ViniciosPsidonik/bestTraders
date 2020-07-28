@@ -127,7 +127,7 @@ const sendToDataBase = () => {
                     const wins = win ? docs[0].win + 1 : docs[0].win
                     const totalTrades = docs[0].win + docs[0].loss + 1
                     const percentageWins = (wins * 100) / totalTrades
-                    Rank.findOneAndUpdate({ userId: value.userId }, { $inc: { win, loss }, percentageWins, totalTrades }, (err, result) => {
+                    Rank.findOneAndUpdate({ userId: value.userId }, { percentageWins, totalTrades, $inc: { win, loss } }, (err, result) => {
                         if (err)
                             log(err)
                     })
