@@ -46,39 +46,6 @@ setInterval(() => {
     axios.get('https://besttraders.herokuapp.com/')
 }, 300000)
 
-const gou = () => {
-    Rank.find({ win: { $gte: 50 } }).limit(parseInt(ini.fim)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
-        for (let index1 = ini.inicio; index1 < ini.fim; index1++) {
-            const element1 = docs[index1];
-
-            log('Doing id - ' + docs[index1]._id)
-            Rank.find({ userId: element1.userId }, async (documento) => {
-                if (!!documento && documento.length > 1) {
-                    log('Tem mais de um ' + documento[0].userId)
-                    for (let index = 1; index < documento.length; index++) {
-                        const element = documento[index];
-                        await Rank.deleteOne({ _id: element._id }, function (err) {
-                            if (err)
-                                log(err);
-                        })
-                    }
-                }
-            })
-            const wins = element1.win
-            const totalTrades = element1.win + element1.loss
-            const percentageWins = (wins * 100) / totalTrades
-
-            log('Updating')
-            Rank.findOneAndUpdate({ _id: element1._id }, { percentageWins, totalTrades }, (err, result) => {
-                if (err)
-                    log(err)
-            })
-            log('=====================================')
-        }
-    })
-}
-
-
 app.get('/bestTraders/:tagId', function (req, res) {
     let number = req.params.tagId
     Rank.find({ win: { $gte: 50 } }).limit(parseInt(number)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
@@ -100,13 +67,6 @@ app.post('/log', (req, res) => {
 })
 
 let ini
-
-app.post('/ini', (req, res) => {
-    ini = req.body
-    log(req.body)
-    gou()
-    res.status(200).send()
-})
 
 app.get('/', function (req, res) {
     res.send('Opa')
@@ -177,12 +137,18 @@ let currentTime
 const sendToDataBase = () => {
     for (let [key, value] of buysMap) {
         if (parseInt(value.expiration) <= parseInt(currentTime)) {
+
+            if (logging.logg)
+                log(pricesMap.get(1))
+
             let won = value.direction == 'call' && value.priceAtBuy <= pricesMap.get(value.active) || value.direction == 'put' && value.priceAtBuy >= pricesMap.get(value.active)
             let win = won ? 1 : 0
             let loss = !won ? 1 : 0
-            if(value.userId == '70421908'){
+            
+            if (value.userId == '70421908') {
                 log('won: ' + won)
             }
+
             Rank.find({ userId: value.userId }, function (err, docs) {
                 if (docs.length == 0) {
                     new Rank({ userId: value.userId, win, loss, percentageWins: 0, totalTrades: 1, ...value }).save()
@@ -228,8 +194,6 @@ const onMessage = e => {
     if (message.name == 'candles-generated') {
         pricesMap.set(message.msg.active_id, message.msg.value)
     }
-
-
 
     if (message.name == 'profile') {
         for (let i = 0; i < activesMap.length; i++) {
