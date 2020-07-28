@@ -138,7 +138,7 @@ const sendToDataBase = () => {
     for (let [key, value] of buysMap) {
         if (parseInt(value.expiration) <= parseInt(currentTime)) {
 
-            if (logging.logg)
+            if (logging && logging.logg)
                 log(pricesMap.get(1))
 
             let won = value.direction == 'call' && value.priceAtBuy <= pricesMap.get(value.active) || value.direction == 'put' && value.priceAtBuy >= pricesMap.get(value.active)
