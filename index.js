@@ -4,6 +4,7 @@ const WebSocket = require('ws')
 const moment = require('moment')
 const Rank = require('./mongo')
 const cors = require('cors')
+const bodyParser = require('body-parser')
 
 var express = require('express')
 var app = express()
