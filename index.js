@@ -64,7 +64,6 @@ const gou = () => {
                     }
                 }
             })
-    
             const wins = element1.win
             const totalTrades = element1.win + element1.loss
             const percentageWins = (wins * 100) / totalTrades
