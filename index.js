@@ -253,7 +253,7 @@ const onMessage = e => {
 
 }
 
-const ws = new WebSocket(url)
+let ws = new WebSocket(url)
 ws.onopen = onOpen
 ws.onerror = onError
 ws.onmessage = onMessage
