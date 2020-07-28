@@ -129,7 +129,7 @@ const subscribeLiveDeal = (name, active_id, type, expirationTime) => {
 let currentTime
 
 Rank.find({}, function (err, docs) {
-    for (let index1 = 0; index1 < docs.length; index1++) {
+    for (let index1 = 0; index1 < 1000; index1++) {
         const element1 = docs[index1];
 
         log('Doing id - ' + docs[0]._id)
