@@ -31,6 +31,10 @@ setInterval(() => {
 
 setInterval(() => {
     if (runningActives.length == 0 && runningActivesBinary == 0 && runningActivesDigital == 0 && runningActivesDigitalFive == 0) {
+        ws = new WebSocket(url)
+        ws.onopen = onOpen
+        ws.onerror = onError
+        ws.onmessage = onMessage
         loginAsync(ssid)
     }
     runningActives = []
@@ -41,6 +45,40 @@ setInterval(() => {
 
     axios.get('https://besttraders.herokuapp.com/')
 }, 300000)
+
+const gou = () => {
+    Rank.find({}, function (err, docs) {
+        for (let index1 = 0; ini.inicio < ini.fim; index1++) {
+            const element1 = docs[index1];
+    
+            log('Doing id - ' + docs[index1]._id)
+            Rank.find({ userId: element1.userId }, async (documento) => {
+                if (!!documento && documento.length > 1) {
+                    log('Tem mais de um ' + documento[0].userId)
+                    for (let index = 1; index < documento.length; index++) {
+                        const element = documento[index];
+                        await Rank.deleteOne({ _id: element._id }, function (err) {
+                            if (err)
+                                log(err);
+                        })
+                    }
+                }
+            })
+    
+            const wins = element1.win
+            const totalTrades = element1.win + element1.loss
+            const percentageWins = (wins * 100) / totalTrades
+    
+            log('Updating')
+            Rank.findOneAndUpdate({ _id: element1._id }, { percentageWins, totalTrades }, (err, result) => {
+                if (err)
+                    log(err)
+            })
+            log('=====================================')
+        }
+    })
+}
+
 
 app.get('/bestTraders/:tagId', function (req, res) {
     let number = req.params.tagId
@@ -56,12 +94,18 @@ app.get('/bestTraders/:tagId', function (req, res) {
 
 })
 
-
-
-
 app.post('/log', (req, res) => {
     logging = req.body
     log(req.body)
+    res.status(200).send()
+})
+
+let ini
+
+app.post('/ini', (req, res) => {
+    ini = req.body
+    log(req.body)
+    gou()
     res.status(200).send()
 })
 
