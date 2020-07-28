@@ -47,7 +47,7 @@ setInterval(() => {
 }, 300000)
 
 const gou = () => {
-    Rank.find({ win: { $gte: 50 } }).limit(parseInt(ini.fim)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
+    Rank.find().limit(parseInt(ini.fim)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
         for (let index1 = ini.inicio; index1 < ini.fim; index1++) {
             const element1 = docs[index1];
 
@@ -81,7 +81,7 @@ const gou = () => {
 
 app.get('/bestTraders/:tagId', function (req, res) {
     let number = req.params.tagId
-    Rank.find({}).limit(parseInt(number)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
+    Rank.find({ win: { $gte: 50 } }).limit(parseInt(number)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
         log(docs)
         let itemsBack = []
         for (let index = 0; index < docs.length; index++) {
