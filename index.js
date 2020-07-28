@@ -53,6 +53,9 @@ app.get('/bestTraders/:tagId', function (req, res) {
 
 })
 
+
+
+
 app.post('/log', (req, res) => {
     logging = req.body
     log(req.body)
@@ -124,6 +127,35 @@ const subscribeLiveDeal = (name, active_id, type, expirationTime) => {
 }
 
 let currentTime
+
+Rank.find({}, async function (err, docs) {
+    for (let index1 = 0; index1 < docs.length; index1++) {
+        const element1 = docs[index1];
+
+        log('Doing id - ' + docs[0]._id)
+        Rank.find({ userId: docs[0].userId }, (documento) => {
+            if (!!documento && documento.length > 1) {
+                log('Tem mais de um ' + documento[0].userId)
+                for (let index = 1; index < documento.length; index++) {
+                    const element = documento[index];
+                    await Rank.deleteOne({ _id: element._id }, function (err) {
+                        if (err)
+                            log(err);
+                    })
+                }
+            }
+        })
+
+        const wins = docs[0].win
+        const totalTrades = docs[0].win + docs[0].loss
+        const percentageWins = (wins * 100) / totalTrades
+
+        Rank.findOneAndUpdate({ _id: docs[0]._id }, { percentageWins, totalTrades }, (err, result) => {
+            if (err)
+                log(err)
+        })
+    }
+})
 
 const sendToDataBase = () => {
     for (let [key, value] of buysMap) {
