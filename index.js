@@ -48,7 +48,7 @@ setInterval(() => {
 
 const gou = () => {
     Rank.find({}).limit(parseInt(ini.fim)).exec((err, docs) => {
-        for (let index1 = 0; index1 < ini.fim; index1++) {
+        for (let index1 = ini.inicio; index1 < ini.fim; index1++) {
             const element1 = docs[index1];
 
             log('Doing id - ' + docs[index1]._id)
