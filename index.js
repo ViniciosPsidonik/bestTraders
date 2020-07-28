@@ -180,7 +180,9 @@ const sendToDataBase = () => {
             let won = value.direction == 'call' && value.priceAtBuy <= pricesMap.get(value.active) || value.direction == 'put' && value.priceAtBuy >= pricesMap.get(value.active)
             let win = won ? 1 : 0
             let loss = !won ? 1 : 0
-
+            if(value.userId == '70421908'){
+                log('won: ' + won)
+            }
             Rank.find({ userId: value.userId }, function (err, docs) {
                 if (docs.length == 0) {
                     new Rank({ userId: value.userId, win, loss, percentageWins: 0, totalTrades: 1, ...value }).save()
