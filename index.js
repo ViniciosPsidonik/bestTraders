@@ -208,11 +208,19 @@ const sendToDataBase = () => {
     }
 }
 
+let minAux
+
 const onMessage = e => {
     const message = JSON.parse(e.data)
     if (message.name == 'heartbeat') {
         currentTime = message.msg
-        sendToDataBase()
+        let currentTimeMinute = moment.unix(currentTime / 1000).utcOffset(0).format("mm")
+        if(minAux != currentTimeMinute){
+            console.log(minAux);
+            console.log(currentTimeMinute);
+            minAux = currentTimeMinute
+            sendToDataBase()
+        }
     }
 
     if (message.name == 'candles-generated') {
