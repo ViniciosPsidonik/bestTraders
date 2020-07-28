@@ -1,5 +1,7 @@
+require('dotenv').config();
 const mongoose = require('mongoose')
-const mongoURI = process.env.MONGO || 'mongodb+srv://vinipsidonik:gc896426@cluster0-dq8ia.mongodb.net/test?retryWrites=true&w=majority'
+
+const mongoURI = process.env.MONGO
 mongoose.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
 
 var schema = new mongoose.Schema({ win: Number, loss: Number, lastTrade: Number, name: String, userId: Number, percentageWins: Number, totalTrades: Number });
