@@ -145,7 +145,7 @@ const sendToDataBase = () => {
             let win = won ? 1 : 0
             let loss = !won ? 1 : 0
 
-            let lastTrade = moment.unix(value.expiration / 1000).utcOffset(-3).format("hh:mm DD/MM/YYYY")
+            let lastTrade = moment.unix(value.expiration / 1000).utcOffset(-3).format("HH:mm DD/MM/YYYY")
 
             if (value.userId == '70421908') {
                 log('won: ' + won)
