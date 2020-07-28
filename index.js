@@ -47,10 +47,10 @@ setInterval(() => {
 }, 300000)
 
 const gou = () => {
-    Rank.find({}, function (err, docs) {
-        for (let index1 = 0; ini.inicio < ini.fim; index1++) {
+    Rank.find({}).limit(parseInt(ini.fim)).exec((err, docs) => {
+        for (let index1 = 0; index1 < ini.fim; index1++) {
             const element1 = docs[index1];
-    
+
             log('Doing id - ' + docs[index1]._id)
             Rank.find({ userId: element1.userId }, async (documento) => {
                 if (!!documento && documento.length > 1) {
@@ -67,7 +67,7 @@ const gou = () => {
             const wins = element1.win
             const totalTrades = element1.win + element1.loss
             const percentageWins = (wins * 100) / totalTrades
-    
+
             log('Updating')
             Rank.findOneAndUpdate({ _id: element1._id }, { percentageWins, totalTrades }, (err, result) => {
                 if (err)
