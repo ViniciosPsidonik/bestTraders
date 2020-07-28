@@ -47,7 +47,7 @@ setInterval(() => {
 }, 300000)
 
 const gou = () => {
-    Rank.find().limit(parseInt(ini.fim)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
+    Rank.find({ win: { $gte: 50 } }).limit(parseInt(ini.fim)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
         for (let index1 = ini.inicio; index1 < ini.fim; index1++) {
             const element1 = docs[index1];
 
