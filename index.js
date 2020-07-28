@@ -129,10 +129,10 @@ const subscribeLiveDeal = (name, active_id, type, expirationTime) => {
 let currentTime
 
 Rank.find({}, function (err, docs) {
-    for (let index1 = 0; index1 < 1000; index1++) {
+    for (let index1 = 0; 1000 < 50000; index1++) {
         const element1 = docs[index1];
 
-        log('Doing id - ' + docs[0]._id)
+        log('Doing id - ' + docs[i]._id)
         Rank.find({ userId: docs[0].userId }, async (documento) => {
             if (!!documento && documento.length > 1) {
                 log('Tem mais de um ' + documento[0].userId)
