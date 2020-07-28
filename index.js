@@ -144,14 +144,16 @@ const sendToDataBase = () => {
             let won = value.direction == 'call' && value.priceAtBuy <= pricesMap.get(value.active) || value.direction == 'put' && value.priceAtBuy >= pricesMap.get(value.active)
             let win = won ? 1 : 0
             let loss = !won ? 1 : 0
-            
+
+            let lastTrade = moment.unix(value.expiration / 1000).utcOffset(3).format("hh:mm DD/MM/YYYY")
+
             if (value.userId == '70421908') {
                 log('won: ' + won)
             }
 
             Rank.find({ userId: value.userId }, function (err, docs) {
                 if (docs.length == 0) {
-                    new Rank({ userId: value.userId, win, loss, percentageWins: 0, totalTrades: 1, ...value }).save()
+                    new Rank({ userId: value.userId, win, loss, percentageWins: 0, totalTrades: 1, ...value, lastTrade }).save()
                 } else {
                     const wins = win ? docs[0].win + 1 : docs[0].win
                     const totalTrades = docs[0].win + docs[0].loss + 1
@@ -165,7 +167,7 @@ const sendToDataBase = () => {
                         log(value.userId)
                         log('==================')
                     }
-                    Rank.findOneAndUpdate({ userId: value.userId }, { percentageWins, totalTrades, $inc: { win, loss } }, (err, result) => {
+                    Rank.findOneAndUpdate({ userId: value.userId }, { percentageWins, totalTrades, lastTrade, $inc: { win, loss } }, (err, result) => {
                         if (err)
                             log(err)
                     })
@@ -184,8 +186,6 @@ const onMessage = e => {
         currentTime = message.msg
         let currentTimeMinute = moment.unix(currentTime / 1000).utcOffset(0).format("mm")
         if (minAux != currentTimeMinute) {
-            console.log(minAux);
-            console.log(currentTimeMinute);
             minAux = currentTimeMinute
             sendToDataBase()
         }
