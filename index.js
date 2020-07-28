@@ -139,13 +139,15 @@ const sendToDataBase = () => {
                     const wins = win ? docs[0].win + 1 : docs[0].win
                     const totalTrades = docs[0].win + docs[0].loss + 1
                     const percentageWins = (wins * 100) / totalTrades
-                    log(win)
-                    log(docs[0].win)
-                    log(docs[0].loss)
-                    log(docs[0].percentageWins)
-                    log(docs[0].totalTrades)
-                    log(value.userId)
-                    log('==================')
+                    if (logging && logging.logFoundTrades) {
+                        log(win)
+                        log(docs[0].win)
+                        log(docs[0].loss)
+                        log(docs[0].percentageWins)
+                        log(docs[0].totalTrades)
+                        log(value.userId)
+                        log('==================')
+                    }
                     Rank.findOneAndUpdate({ userId: value.userId }, { percentageWins, totalTrades, $inc: { win, loss } }, (err, result) => {
                         if (err)
                             log(err)
