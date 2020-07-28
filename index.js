@@ -8,6 +8,7 @@ const cors = require('cors')
 var express = require('express')
 var app = express()
 app.use(cors({ origin: '*' }))
+app.use(bodyParser.json())
 
 let runningActives = []
 let runningActivesBinary = []
@@ -45,6 +46,11 @@ app.get('/bestTraders/:tagId', function (req, res) {
         res.send(itemsBack)
     })
 
+})
+
+app.post('/log', (req, res) => {
+    log(req.body)
+    res.status(200).send()
 })
 
 app.get('/', function (req, res) {
@@ -148,6 +154,8 @@ const onMessage = e => {
     if (message.name == 'candles-generated') {
         pricesMap.set(message.msg.active_id, message.msg.value)
     }
+
+
 
     if (message.name == 'profile') {
         for (let i = 0; i < activesMap.length; i++) {
