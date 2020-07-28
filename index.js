@@ -144,6 +144,7 @@ const sendToDataBase = () => {
                     log(docs[0].loss)
                     log(docs[0].percentageWins)
                     log(docs[0].totalTrades)
+                    log(value.userId)
                     log('==================')
                     Rank.findOneAndUpdate({ userId: value.userId }, { percentageWins, totalTrades, $inc: { win, loss } }, (err, result) => {
                         if (err)
