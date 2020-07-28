@@ -30,6 +30,9 @@ setInterval(() => {
 }, 5000)
 
 setInterval(() => {
+    if (runningActives.length == 0 && runningActivesBinary == 0 && runningActivesDigital == 0 && runningActivesDigitalFive == 0) {
+        loginAsync(ssid)
+    }
     runningActives = []
     runningActivesBinary = []
     runningActivesDigital = []
