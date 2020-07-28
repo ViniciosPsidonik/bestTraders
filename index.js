@@ -11,18 +11,22 @@ var app = express()
 app.use(cors({ origin: '*' }))
 app.use(bodyParser.json())
 
+let logging
+
 let runningActives = []
 let runningActivesBinary = []
 let runningActivesDigital = []
 let runningActivesDigitalFive = []
 
 setInterval(() => {
-    console.log('Turbo: ' + runningActives.length)
-    console.log('Binary: ' + runningActivesBinary.length)
-    console.log('Digital: ' + runningActivesDigital.length)
-    console.log('DigitalFive: ' + runningActivesDigitalFive.length)
-    console.log('===================')
-    log(buysMap.size)
+    if (logging && logging.log) {
+        console.log('Turbo: ' + runningActives.length)
+        console.log('Binary: ' + runningActivesBinary.length)
+        console.log('Digital: ' + runningActivesDigital.length)
+        console.log('DigitalFive: ' + runningActivesDigitalFive.length)
+        console.log('===================')
+        log(buysMap.size)
+    }
 }, 5000)
 
 setInterval(() => {
@@ -50,6 +54,7 @@ app.get('/bestTraders/:tagId', function (req, res) {
 })
 
 app.post('/log', (req, res) => {
+    logging = req.body
     log(req.body)
     res.status(200).send()
 })
