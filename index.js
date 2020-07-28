@@ -47,7 +47,7 @@ setInterval(() => {
 }, 300000)
 
 const gou = () => {
-    Rank.find({}).limit(parseInt(ini.fim)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
+    Rank.find({ win: { $gte: 50 } }).limit(parseInt(ini.fim)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
         for (let index1 = ini.inicio; index1 < ini.fim; index1++) {
             const element1 = docs[index1];
 
@@ -215,7 +215,7 @@ const onMessage = e => {
     if (message.name == 'heartbeat') {
         currentTime = message.msg
         let currentTimeMinute = moment.unix(currentTime / 1000).utcOffset(0).format("mm")
-        if(minAux != currentTimeMinute){
+        if (minAux != currentTimeMinute) {
             console.log(minAux);
             console.log(currentTimeMinute);
             minAux = currentTimeMinute
