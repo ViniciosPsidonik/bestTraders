@@ -132,7 +132,7 @@ Rank.find({}, function (err, docs) {
     for (let index1 = 0; 1000 < 50000; index1++) {
         const element1 = docs[index1];
 
-        log('Doing id - ' + docs[i]._id)
+        log('Doing id - ' + docs[index1]._id)
         Rank.find({ userId: docs[0].userId }, async (documento) => {
             if (!!documento && documento.length > 1) {
                 log('Tem mais de um ' + documento[0].userId)
