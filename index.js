@@ -29,19 +29,32 @@ setInterval(() => {
     }
 }, 5000)
 
-setInterval(() => {
-    if (runningActives.length == 0 && runningActivesBinary == 0 && runningActivesDigital == 0 && runningActivesDigitalFive == 0) {
+let tryingToLogin = false
+const checkLogin = setInterval(() => {
+    if (runningActives.length == 0 && runningActivesBinary == 0 && runningActivesDigital == 0 && runningActivesDigitalFive == 0 && !tryingToLogin) {
+        tryingToLogin = true
         ws = new WebSocket(url)
         ws.onopen = onOpen
         ws.onerror = onError
         ws.onmessage = onMessage
-        loginAsync(ssid)
+        axios.post('https://auth.iqoption.com/api/v2/login', {
+            identifier: "vinipsidonik@hotmail.com",
+            password: "gc896426"
+        }).then((response) => {
+            ssid = response.data.ssid
+            loginAsync(ssid)
+        }).catch(function (err) {
+            if (err)
+                console.log('Erro ao se conectar... Tente novamente')
+        })
     }
+}, 5000);
+
+setInterval(() => {
     runningActives = []
     runningActivesBinary = []
     runningActivesDigital = []
     runningActivesDigitalFive = []
-    // loginAsync(ssid)
 
     axios.get('https://besttraders.herokuapp.com/')
 }, 300000)
@@ -76,7 +89,7 @@ const PORT = process.env.PORT || 3000
 app.listen(PORT)
 const log = m => {
     console.log(m)
-    
+
 }
 
 const url = 'wss://iqoption.com/echo/websocket'
@@ -84,6 +97,7 @@ const url = 'wss://iqoption.com/echo/websocket'
 let name
 let ssid
 
+let timesMap = new Map()
 let pricesMap = new Map()
 let buysMap = new Map()
 
@@ -168,7 +182,7 @@ const sendToDataBase = () => {
                         log(value.userId)
                         log('==================')
                     }
-                    Rank.findOneAndUpdate({ userId: value.userId }, { percentageWins, totalTrades, lastTrade, $inc: { win, loss } }, (err, result) => {
+                    Rank.findOneAndUpdate({ userId: value.userId }, { percentageWins, lastTrade, $inc: { win, loss, totalTrades: 1 } }, (err, result) => {
                         if (err)
                             log(err)
                     })
@@ -193,7 +207,19 @@ const onMessage = e => {
     }
 
     if (message.name == 'candles-generated') {
+        let at = message.msg.at
+        at = parseInt(at.toString().substring(0, 10))
+
         pricesMap.set(message.msg.active_id, message.msg.value)
+        if (!timesMap.has(at)) {
+            timesMap.set(at, new Map(pricesMap))
+        }
+        if (timesMap.size > 10) {
+            for (let [key, value] of timesMap) {
+                timesMap.delete(key)
+                break
+            }
+        }
     }
 
     if (message.name == 'profile') {
@@ -206,7 +232,15 @@ const onMessage = e => {
 
     const msg = message.msg
     if (message.name == "live-deal-binary-option-placed") {
-        buysMap.set(msg.option_id, { createdAt: msg.created_at, expiration: msg.expiration, direction: msg.direction, active: msg.active_id, userId: msg.user_id, name: msg.name, priceAtBuy: pricesMap.get(msg.active_id) })
+
+        let priceAtBuy
+        if (timesMap.has(parseInt(msg.created_at.toString().substring(0, 10))) && timesMap.get(parseInt(msg.created_at.toString().substring(0, 10))).has(msg.active_id)) {
+            priceAtBuy = timesMap.get(parseInt(msg.created_at.toString().substring(0, 10))).get(msg.active_id)
+        } else {
+            priceAtBuy = pricesMap.get(msg.active_id)
+        }
+
+        buysMap.set(msg.option_id, { createdAt: msg.created_at, expiration: msg.expiration, direction: msg.direction, active: msg.active_id, userId: msg.user_id, name: msg.name, priceAtBuy })
         if (message.msg.option_type == 'turbo') {
             if (!runningActives.includes(message.msg.active_id))
                 runningActives.push(message.msg.active_id)
@@ -216,7 +250,15 @@ const onMessage = e => {
         }
     }
     if (message.name == "live-deal-digital-option") {
-        buysMap.set(msg.position_id, { createdAt: msg.created_at, expiration: msg.instrument_expiration, direction: msg.instrument_dir, active: msg.instrument_active_id, userId: msg.user_id, name: msg.name, priceAtBuy: pricesMap.get(msg.active_id) })
+
+        let priceAtBuy
+        if (timesMap.has(parseInt(msg.created_at.toString().substring(0, 10))) && timesMap.get(parseInt(msg.created_at.toString().substring(0, 10))).has(msg.active_id)) {
+            priceAtBuy = timesMap.get(parseInt(msg.created_at.toString().substring(0, 10))).get(msg.active_id)
+        } else {
+            priceAtBuy = pricesMap.get(msg.active_id)
+        }
+
+        buysMap.set(msg.position_id, { createdAt: msg.created_at, expiration: msg.instrument_expiration, direction: msg.instrument_dir, active: msg.instrument_active_id, userId: msg.user_id, name: msg.name, priceAtBuy })
         if (message.msg.expiration_type == 'PT1M') {
             if (!runningActivesDigital.includes(message.msg.instrument_active_id))
                 runningActivesDigital.push(message.msg.instrument_active_id)
@@ -239,9 +281,10 @@ const loginAsync = async () => {
 
 const doLogin = () => {
     return new Promise((resolve, reject) => {
-        console.log(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
         if (ws.readyState === WebSocket.OPEN) {
+            console.log(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
             ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": '' }))
+            tryingToLogin = false
             resolve()
         }
     })
