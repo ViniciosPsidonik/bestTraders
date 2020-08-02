@@ -32,7 +32,7 @@ setInterval(() => {
 
 let tryingToLogin = false
 const checkLogin = setInterval(() => {
-    if (runningActives.length == 0 && runningActivesBinary == 0 && runningActivesDigital == 0 && runningActivesDigitalFive == 0 && !tryingToLogin) {
+    if (runningActives.length == 0 || runningActivesBinary == 0 || runningActivesDigital == 0 || runningActivesDigitalFive == 0 ) {
         tryingToLogin = true
         ws = new WebSocket(url)
         ws.onopen = onOpen
@@ -49,7 +49,7 @@ const checkLogin = setInterval(() => {
                 console.log('Erro ao se conectar... Tente novamente')
         })
     }
-}, 5000);
+}, 300000);
 
 setInterval(() => {
     runningActives = []
@@ -321,6 +321,11 @@ function subscribeActives() {
     for (let i = 0; i < activesMapDigital.length; i++) {
         subscribeLiveDeal(name, activesMapDigital[i], 'digital', '5')
     }
+
+    for (let i = 0; i < activesMapDigital.length; i++) {
+        subscribeLiveDeal(name, activesMapDigital[i], 'digital', '15')
+    }
+    name = 'live-deal-binary-option-placed'
     for (let i = 0; i < otcActives.length; i++) {
         subscribeLiveDeal(name, otcActives[i], 'turbo')
     }
@@ -335,6 +340,10 @@ function subscribeActives() {
 
     for (let i = 0; i < otcActivesDigital.length; i++) {
         subscribeLiveDeal(name, otcActivesDigital[i], 'digital', '5')
+    }
+
+    for (let i = 0; i < otcActivesDigital.length; i++) {
+        subscribeLiveDeal(name, otcActivesDigital[i], 'digital', '15')
     }
 
 }
