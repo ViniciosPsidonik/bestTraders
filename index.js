@@ -156,8 +156,8 @@ const sendToDataBase = () => {
 
             if (logging && logging.logg)
                 log(pricesMap.get(1))
-                
-            let won = value.direction == 'call' && value.priceAtBuy <= timesMap.get(parseInt(value.createdAt.toString().substring(0, 10))).get(value.active) || value.direction == 'put' && value.priceAtBuy >= timesMap.get(parseInt(value.createdAt.toString().substring(0, 10))).get(value.active)
+
+            let won = value.direction == 'call' && value.priceAtBuy <= pricesMap.get(value.active) || value.direction == 'put' && value.priceAtBuy >= pricesMap.get(value.active)
             let win = won ? 1 : 0
             let loss = !won ? 1 : 0
 
