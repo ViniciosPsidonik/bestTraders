@@ -63,7 +63,7 @@ setInterval(() => {
 app.get('/bestTraders/:tagId', function (req, res) {
     let number = req.params.tagId
     Rank.find({ win: { $gte: 50 } }).limit(parseInt(number)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
-        if (logging.log)
+        if (logging && logging.log)
             log(docs)
         let itemsBack = []
         for (let index = 0; index < docs.length; index++) {
