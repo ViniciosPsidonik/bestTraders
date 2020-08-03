@@ -32,7 +32,7 @@ setInterval(() => {
 
 let tryingToLogin = false
 const checkLogin = setInterval(() => {
-    if (runningActives.length == 0 || runningActivesBinary == 0 || runningActivesDigital == 0 || runningActivesDigitalFive == 0 ) {
+    if (runningActives.length == 0 || runningActivesBinary == 0 || runningActivesDigital == 0 || runningActivesDigitalFive == 0) {
         tryingToLogin = true
         ws = new WebSocket(url)
         ws.onopen = onOpen
@@ -63,7 +63,8 @@ setInterval(() => {
 app.get('/bestTraders/:tagId', function (req, res) {
     let number = req.params.tagId
     Rank.find({ win: { $gte: 50 } }).limit(parseInt(number)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
-        log(docs)
+        if (logging.log)
+            log(docs)
         let itemsBack = []
         for (let index = 0; index < docs.length; index++) {
             const element = docs[index];
