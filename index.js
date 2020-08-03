@@ -224,7 +224,6 @@ const onMessage = e => {
 
         let priceAtBuy
         if (timesMap.has(parseInt(msg.created_at.toString().substring(0, 10))) && timesMap.get(parseInt(msg.created_at.toString().substring(0, 10))).has(msg.active_id)) {
-            log('achou1')
             priceAtBuy = timesMap.get(parseInt(msg.created_at.toString().substring(0, 10))).get(msg.active_id)
         } else {
             priceAtBuy = pricesMap.get(msg.active_id)
@@ -243,8 +242,7 @@ const onMessage = e => {
 
         let priceAtBuy
         if (timesMap.has(parseInt(msg.created_at.toString().substring(0, 10))) && timesMap.get(parseInt(msg.created_at.toString().substring(0, 10))).has(msg.instrument_active_id)) {
-            log('achou')
-            priceAtBuy = timesMap.get(parseInt(msg.created_at.toString().substring(0, 10))).get(msg.active_id)
+            priceAtBuy = timesMap.get(parseInt(msg.created_at.toString().substring(0, 10))).get(msg.instrument_active_id)
         } else {
             priceAtBuy = pricesMap.get(msg.active_id)
         }
