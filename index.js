@@ -60,21 +60,6 @@ setInterval(() => {
     axios.get('https://besttraders.herokuapp.com/')
 }, 300000)
 
-app.get('/bestTraders/:tagId', function (req, res) {
-    let number = req.params.tagId
-    Rank.find({ win: { $gte: 50 } }).limit(parseInt(number)).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
-        if (logging && logging.log)
-            log(docs)
-        let itemsBack = []
-        for (let index = 0; index < docs.length; index++) {
-            const element = docs[index];
-            itemsBack.push(element.userId)
-        }
-        res.send(itemsBack)
-    })
-
-})
-
 app.post('/log', (req, res) => {
     logging = req.body
     log(req.body)
@@ -222,6 +207,8 @@ const onMessage = e => {
                 break
             }
         }
+        if(logging && logging.logPrices)
+            log(timesMap)
     }
 
     if (message.name == 'profile') {
