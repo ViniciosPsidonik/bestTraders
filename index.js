@@ -76,15 +76,15 @@ app.get('/', function (req, res) {
 const getBestTraders = () => {
     return new Promise((resolve, reject) => {
         Rank.find({ win: { $gte: 50 } }).limit(500).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
-            copyIds = !isNaN(config.copyIds.split(',')[0]) && !isNaN(config.copyIds.split(',')[1]) ? config.copyIds.split(',') : []
-            if (docs)
+            if (docs) {
+                besttraders = []
                 for (let index = 0; index < docs.length; index++) {
                     const element = docs[index];
                     besttraders.push(`${element.userId}`)
                     if (logging && logging.log)
                         log(besttraders)
                 }
-            else
+            } else
                 console.log('Erro ao capturar os Best Ids ' + err || '');
             resolve()
         })
