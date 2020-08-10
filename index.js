@@ -6,6 +6,7 @@ const Rank = require('./mongo')
 const cors = require('cors')
 const bodyParser = require('body-parser')
 
+let besttraders = []
 
 var express = require('express')
 var app = express()
@@ -58,7 +59,7 @@ setInterval(() => {
     runningActivesDigitalFive = []
 
     axios.get('https://besttraders.herokuapp.com/')
-}, 300000)
+}, 250000)
 
 app.post('/log', (req, res) => {
     logging = req.body
@@ -72,11 +73,36 @@ app.get('/', function (req, res) {
     res.send('Opa')
 })
 
+const getBestTraders = () => {
+    return new Promise((resolve, reject) => {
+        Rank.find({ win: { $gte: 50 } }).limit(500).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
+            copyIds = !isNaN(config.copyIds.split(',')[0]) && !isNaN(config.copyIds.split(',')[1]) ? config.copyIds.split(',') : []
+            if (docs)
+                for (let index = 0; index < docs.length; index++) {
+                    const element = docs[index];
+                    besttraders.push(`${element.userId}`)
+                    if (logging && logging.log)
+                        log(besttraders)
+                }
+            else
+                console.log('Erro ao capturar os Best Ids ' + err || '');
+            resolve()
+        })
+    })
+}
+
+setInterval(async () => {
+    await getBestTraders()
+}, 300000);
+
+app.get('/besttraders', (req, res) => {
+    res.status(200).send(besttraders)
+})
+
 const PORT = process.env.PORT || 3000
 app.listen(PORT)
 const log = m => {
     console.log(m)
-
 }
 
 const url = 'wss://iqoption.com/echo/websocket'
@@ -207,7 +233,7 @@ const onMessage = e => {
                 break
             }
         }
-        if(logging && logging.logPrices)
+        if (logging && logging.logPrices)
             log(timesMap.get(1))
     }
 
@@ -217,6 +243,7 @@ const onMessage = e => {
             ws.send(JSON.stringify({ "name": "subscribeMessage", "msg": { "name": "candles-generated", "params": { "routingFilters": { "active_id": activesMap[i] } } }, "request_id": "" }))
         }
         subscribeActives()
+        getBestTraders()
     }
 
     const msg = message.msg
@@ -335,4 +362,3 @@ function subscribeActives() {
     }
 
 }
-
