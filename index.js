@@ -75,15 +75,15 @@ app.get('/', function (req, res) {
 
 const getBestTraders = () => {
     return new Promise((resolve, reject) => {
-        Rank.find({ win: { $gte: 50 } }).limit(500).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
+        Rank.find({ win: { $gte: 50 } }).limit(5000).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
             if (docs) {
                 besttraders = []
                 for (let index = 0; index < docs.length; index++) {
                     const element = docs[index];
                     besttraders.push(`${element.userId}`)
-                    if (logging && logging.log)
-                        log(besttraders)
                 }
+                if (logging && logging.log)
+                    log(besttraders)
             } else
                 console.log('Erro ao capturar os Best Ids ' + err || '');
             resolve()
@@ -176,6 +176,10 @@ const sendToDataBase = () => {
             let lastTrade = moment.unix(value.expiration / 1000).utcOffset(-3).format("HH:mm DD/MM/YYYY")
 
             if (value.userId == '70421908') {
+                log('won: ' + won)
+            }
+
+            if (logging && logging.userId == value.userId) {
                 log('won: ' + won)
             }
 
