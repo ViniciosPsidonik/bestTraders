@@ -32,9 +32,12 @@ setInterval(() => {
 }, 5000)
 
 let tryingToLogin = false
+let logged = false
 const checkLogin = setInterval(() => {
-    if (runningActives.length == 0 || runningActivesBinary == 0 || runningActivesDigital == 0 || runningActivesDigitalFive == 0) {
+    if (runningActives.length == 0 || runningActivesBinary.length == 0 || runningActivesDigital.length == 0 || runningActivesDigitalFive.length == 0) {
         tryingToLogin = true
+        ws.terminate();
+		logged = false
         ws = new WebSocket(url)
         ws.onopen = onOpen
         ws.onerror = onError
@@ -44,7 +47,11 @@ const checkLogin = setInterval(() => {
             password: "gc896426"
         }).then((response) => {
             ssid = response.data.ssid
-            loginAsync(ssid)
+            const loginn = setInterval(() => {
+                loginAsync(ssid)
+                if (logged)
+                    clearInterval(loginn)
+            }, 2000);
         }).catch(function (err) {
             if (err)
                 console.log('Erro ao se conectar... Tente novamente')
@@ -306,6 +313,7 @@ const doLogin = () => {
             console.log(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
             ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": '' }))
             tryingToLogin = false
+            logged = true
             resolve()
         }
     })
