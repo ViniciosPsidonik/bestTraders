@@ -83,7 +83,7 @@ app.get('/', function (req, res) {
 
 const getBestTraders = () => {
     return new Promise((resolve, reject) => {
-        Rank.find({ win: { $gte: 50 } }).limit(5000).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
+        Rank.find({ win: { $gte: 100 } }).limit(5000).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
             if (docs) {
                 besttraders = []
                 for (let index = 0; index < docs.length; index++) {
