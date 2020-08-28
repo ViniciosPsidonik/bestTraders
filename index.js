@@ -33,31 +33,31 @@ setInterval(() => {
 
 let tryingToLogin = false
 let logged = false
-const checkLogin = setInterval(() => {
-    if (runningActives.length == 0 || runningActivesBinary.length == 0 || runningActivesDigital.length == 0 || runningActivesDigitalFive.length == 0) {
-        tryingToLogin = true
-        ws.terminate();
-		logged = false
-        ws = new WebSocket(url)
-        ws.onopen = onOpen
-        ws.onerror = onError
-        ws.onmessage = onMessage
-        axios.post('https://auth.iqoption.com/api/v2/login', {
-            identifier: "vinipsidonik@hotmail.com",
-            password: "gc896426"
-        }).then((response) => {
-            ssid = response.data.ssid
-            const loginn = setInterval(() => {
-                loginAsync(ssid)
-                if (logged)
-                    clearInterval(loginn)
-            }, 2000);
-        }).catch(function (err) {
-            if (err)
-                console.log('Erro ao se conectar... Tente novamente')
-        })
-    }
-}, 300000);
+// const checkLogin = setInterval(() => {
+//     if (runningActives.length == 0 || runningActivesBinary.length == 0 || runningActivesDigital.length == 0 || runningActivesDigitalFive.length == 0) {
+//         tryingToLogin = true
+//         ws.terminate();
+// 		logged = false
+//         ws = new WebSocket(url)
+//         ws.onopen = onOpen
+//         ws.onerror = onError
+//         ws.onmessage = onMessage
+//         axios.post('https://auth.iqoption.com/api/v2/login', {
+//             identifier: "vinipsidonik@hotmail.com",
+//             password: "gc896426"
+//         }).then((response) => {
+//             ssid = response.data.ssid
+//             const loginn = setInterval(() => {
+//                 loginAsync(ssid)
+//                 if (logged)
+//                     clearInterval(loginn)
+//             }, 2000);
+//         }).catch(function (err) {
+//             if (err)
+//                 console.log('Erro ao se conectar... Tente novamente')
+//         })
+//     }
+// }, 300000);
 
 
 setInterval(() => {
@@ -239,7 +239,7 @@ const onMessage = e => {
         if (!timesMap.has(at)) {
             timesMap.set(at, new Map(pricesMap))
         }
-        if (timesMap.size > 10) {
+        if (timesMap.size > 10000) {
             for (let [key, value] of timesMap) {
                 timesMap.delete(key)
                 break
