@@ -145,16 +145,16 @@ let currentTime
 const sendToDataBase = () => {
     log('sendToDataBase')
     for (let [key, value] of buysMap) {
-        if (timesMap.has(parseInt(value.expiration.toString().substring(0, 10))) && timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).has(msg.active)) {
+        if (timesMap.has(parseInt(value.expiration.toString().substring(0, 10))) && timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).has(value.active)) {
 
             if (logging && logging.logg)
                 log(pricesMap.get(1))
 
             let priceExpired
-            if (timesMap.has(parseInt(value.expiration.toString().substring(0, 10))) && timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).has(msg.active)) {
-                priceExpired = timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).get(msg.active)
+            if (timesMap.has(parseInt(value.expiration.toString().substring(0, 10))) && timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).has(value.active)) {
+                priceExpired = timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).get(value.active)
             } else {
-                priceExpired = pricesMap.get(msg.active)
+                priceExpired = pricesMap.get(value.active)
             }
 
             let won = value.direction == 'call' && value.priceAtBuy < priceExpired || value.direction == 'put' && value.priceAtBuy > priceExpired
