@@ -83,7 +83,7 @@ app.get('/', function (req, res) {
 
 const getBestTraders = () => {
     return new Promise((resolve, reject) => {
-           
+        console.log(moment().subtract(3, 'h').subtract(3, 'days').toDate());
         Rank.find({ win: { $gte: 100 }, lastTrade: { $gte: moment().utcOffset(-3).subtract(3, 'days').toDate()} }).limit(5000).sort([['percentageWins', -1], ['totalTrades', -1]]).exec((err, docs) => {
             if (docs) {
                 besttraders = []
