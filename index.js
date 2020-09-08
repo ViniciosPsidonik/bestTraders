@@ -143,21 +143,13 @@ const subscribeLiveDeal = (name, active_id, type, expirationTime) => {
 let currentTime
 
 const sendToDataBase = () => {
-    log('sendToDataBase')
     for (let [key, value] of buysMap) {
-        if (timesMap.has(parseInt(value.expiration.toString().substring(0, 10))) && timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).has(value.active)) {
+        if (parseInt(value.expiration) <= parseInt(currentTime)) {
 
             if (logging && logging.logg)
                 log(pricesMap.get(1))
 
-            let priceExpired
-            if (timesMap.has(parseInt(value.expiration.toString().substring(0, 10))) && timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).has(value.active)) {
-                priceExpired = timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).get(value.active)
-            } else {
-                priceExpired = pricesMap.get(value.active)
-            }
-
-            let won = value.direction == 'call' && value.priceAtBuy < priceExpired || value.direction == 'put' && value.priceAtBuy > priceExpired
+            let won = value.direction == 'call' && value.priceAtBuy <= pricesMap.get(value.active) || value.direction == 'put' && value.priceAtBuy >= pricesMap.get(value.active)
             let win = won ? 1 : 0
             let loss = !won ? 1 : 0
 
@@ -199,10 +191,6 @@ const sendToDataBase = () => {
 }
 
 let minAux
-
-setInterval(() => {
-    sendToDataBase()
-}, 61000);
 
 const onMessage = e => {
     const message = JSON.parse(e.data)
