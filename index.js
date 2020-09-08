@@ -199,7 +199,7 @@ const onMessage = e => {
         let currentTimeMinute = moment.unix(currentTime / 1000).utcOffset(0).format("mm")
         if (minAux != currentTimeMinute) {
             minAux = currentTimeMinute
-            // sendToDataBase()
+            sendToDataBase()
         }
     }
 
