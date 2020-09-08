@@ -31,35 +31,6 @@ setInterval(() => {
     }
 }, 5000)
 
-let tryingToLogin = false
-let logged = false
-// const checkLogin = setInterval(() => {
-//     if (runningActives.length == 0 || runningActivesBinary.length == 0 || runningActivesDigital.length == 0 || runningActivesDigitalFive.length == 0) {
-//         tryingToLogin = true
-//         ws.terminate();
-// 		logged = false
-//         ws = new WebSocket(url)
-//         ws.onopen = onOpen
-//         ws.onerror = onError
-//         ws.onmessage = onMessage
-//         axios.post('https://auth.iqoption.com/api/v2/login', {
-//             identifier: "vinipsidonik@hotmail.com",
-//             password: "gc896426"
-//         }).then((response) => {
-//             ssid = response.data.ssid
-//             const loginn = setInterval(() => {
-//                 loginAsync(ssid)
-//                 if (logged)
-//                     clearInterval(loginn)
-//             }, 2000);
-//         }).catch(function (err) {
-//             if (err)
-//                 console.log('Erro ao se conectar... Tente novamente')
-//         })
-//     }
-// }, 300000);
-
-
 setInterval(() => {
     runningActives = []
     runningActivesBinary = []
@@ -172,13 +143,21 @@ const subscribeLiveDeal = (name, active_id, type, expirationTime) => {
 let currentTime
 
 const sendToDataBase = () => {
+    log('sendToDataBase')
     for (let [key, value] of buysMap) {
-        if (parseInt(value.expiration) <= parseInt(currentTime)) {
+        if (timesMap.has(parseInt(value.expiration.toString().substring(0, 10))) && timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).has(msg.active)) {
 
             if (logging && logging.logg)
                 log(pricesMap.get(1))
 
-            let won = value.direction == 'call' && value.priceAtBuy <= pricesMap.get(value.active) || value.direction == 'put' && value.priceAtBuy >= pricesMap.get(value.active)
+            let priceExpired
+            if (timesMap.has(parseInt(value.expiration.toString().substring(0, 10))) && timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).has(msg.active)) {
+                priceExpired = timesMap.get(parseInt(value.expiration.toString().substring(0, 10))).get(msg.active)
+            } else {
+                priceExpired = pricesMap.get(msg.active)
+            }
+
+            let won = value.direction == 'call' && value.priceAtBuy < priceExpired || value.direction == 'put' && value.priceAtBuy > priceExpired
             let win = won ? 1 : 0
             let loss = !won ? 1 : 0
 
@@ -221,6 +200,10 @@ const sendToDataBase = () => {
 
 let minAux
 
+setInterval(() => {
+    sendToDataBase()
+}, 61000);
+
 const onMessage = e => {
     const message = JSON.parse(e.data)
     if (message.name == 'heartbeat') {
@@ -228,7 +211,7 @@ const onMessage = e => {
         let currentTimeMinute = moment.unix(currentTime / 1000).utcOffset(0).format("mm")
         if (minAux != currentTimeMinute) {
             minAux = currentTimeMinute
-            sendToDataBase()
+            // sendToDataBase()
         }
     }
 
@@ -310,13 +293,16 @@ const loginAsync = async () => {
 
 const doLogin = () => {
     return new Promise((resolve, reject) => {
-        if (ws.readyState === WebSocket.OPEN) {
-            console.log(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
-            ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": '' }))
-            tryingToLogin = false
-            logged = true
-            resolve()
-        }
+        const aaaaa = setInterval(() => {
+            if (ws.readyState === WebSocket.OPEN) {
+                console.log(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": "" }))
+                ws.send(JSON.stringify({ 'name': 'ssid', 'msg': ssid, "request_id": '' }))
+                tryingToLogin = false
+                logged = true
+                clearInterval(aaaaa)
+                resolve()
+            }
+        }, 800);
     })
 }
 
