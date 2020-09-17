@@ -37,7 +37,7 @@ setInterval(() => {
     runningActivesDigital = []
     runningActivesDigitalFive = []
 
-    axios.get('https://besttraders.herokuapp.com/')
+    axios.get('https://besttraders1.herokuapp.com/')
 }, 250000)
 
 app.post('/log', (req, res) => {
