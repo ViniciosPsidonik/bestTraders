@@ -17,7 +17,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "jsdom": "^16.3.0",
-    "moment": "^2.27.0",
+    "moment": "^2.29.2",
     "mongoose": "^5.9.25",
     "node-html-parser": "^1.2.20",
     "pkg": "^4.4.9",
